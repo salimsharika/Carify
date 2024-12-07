@@ -30,5 +30,18 @@ require __DIR__.'/auth.php';
 
 route::get('admin/dashboard',[HomeController::class,'index'])->middleware(['auth','admin']);
 
-Route::get('/addCar', [CarController::class, 'create'])->name('addCar');
-Route::post('/storeCar', [CarController::class, 'store'])->name('storeCar');
+
+
+// Dashboard route
+Route::get('/dashboard', [CarController::class, 'index'])->name('dashboard');
+
+// Add a car
+Route::get('/car/add', [CarController::class, 'create'])->name('addCar');
+Route::post('/car/add', [CarController::class, 'store']);
+
+// Edit a car
+Route::get('/car/{id}/edit', [CarController::class, 'edit'])->name('editCar');
+Route::post('/car/{id}/update', [CarController::class, 'update'])->name('updateCar');
+
+// Show car suggestions
+Route::get('/car/{id}/suggestions', [CarController::class, 'showSuggestions'])->name('showCarSuggestions');
