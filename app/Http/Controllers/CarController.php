@@ -94,7 +94,7 @@ class CarController extends Controller
         return view('carSuggestions', compact('car', 'suggestions'));
     }
 
-        public function marketplace()
+    public function marketplace()
     {
         $cars = Car::where('is_for_sale', true)
             ->with(['owner', 'comments.user'])
@@ -121,7 +121,7 @@ class CarController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
-        public function storeComment(Request $request, $carId)
+    public function storeComment(Request $request, $carId)
     {
         $request->validate([
             'comment' => 'required|string|max:500',
@@ -135,5 +135,67 @@ class CarController extends Controller
         ]);
 
         return redirect()->route('marketplace')->with('success', 'Comment added successfully!');
+    }
+
+    /**
+     * Add a car to the user's wishlist.
+     *
+     * @param  int  $carId
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function addToWishlist($carId)
+    {
+        $user = auth()->user();
+        if ($user->wishlist()->where('car_id', $carId)->exists()) {
+            return redirect()->back()->with('info', 'Car is already in your wishlist.');
+        }
+        $user->wishlist()->attach($carId);
+
+        return redirect()->back()->with('success', 'Car added to wishlist!');
+    }
+
+    /**
+     * Remove a car from the user's wishlist.
+     *
+     * @param  int  $carId
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function removeFromWishlist($carId)
+    {
+        $user = auth()->user();
+        $user->wishlist()->detach($carId);
+
+        return redirect()->back()->with('success', 'Car removed from wishlist!');
+    }
+
+    /**
+     * Display the user's wishlist.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showWishlist()
+    {
+        $user = auth()->user();
+        $wishlistCars = $user->wishlist()->with('owner')->get();
+
+        return view('wishlist', compact('wishlistCars'));
+    }
+
+    /**
+     * Compare selected cars.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function compare(Request $request)
+    {
+        $carIds = $request->input('car_ids');
+        $cars = Car::whereIn('id', $carIds)->get();
+
+        if ($cars->count() !== 2) {
+            return redirect()->back()->with('error', 'Please select exactly two cars to compare.');
+        }
+
+        return view('compare', compact('cars'));
     }
 }

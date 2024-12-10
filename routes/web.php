@@ -23,9 +23,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/car/{id}/update', [CarController::class, 'update'])->name('updateCar');
     Route::get('/car/{id}/suggestions', [CarController::class, 'showSuggestions'])->name('showCarSuggestions');
     
+    // Wishlist routes
+    Route::get('/wishlist', [CarController::class, 'showWishlist'])->name('wishlist.index');
+    Route::post('/wishlist/add/{car}', [CarController::class, 'addToWishlist'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{car}', [CarController::class, 'removeFromWishlist'])->name('wishlist.remove');
+
     // Marketplace routes
     Route::get('/marketplace', [CarController::class, 'marketplace'])->name('marketplace');
     Route::post('/car/{id}/toggle-sale', [CarController::class, 'toggleSale'])->name('toggleSale');
+
+    // Route for comparing cars
+    Route::post('/cars/compare', [CarController::class, 'compare'])->name('cars.compare');
 });
 
 // Admin routes

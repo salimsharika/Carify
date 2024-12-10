@@ -34,4 +34,12 @@ class Car extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    /**
+     * Get the users who have added this car to their wishlist.
+     */
+    public function wishlistedBy()
+    {
+        return $this->belongsToMany(User::class, 'wishlists');
+    }
 }

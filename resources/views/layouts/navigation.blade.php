@@ -19,6 +19,9 @@
                         <x-nav-link :href="route('marketplace')" :active="request()->routeIs('marketplace')">
                             {{ __('Marketplace') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.index')">
+                            {{ __('Wishlist') }}
+                        </x-nav-link>
                     @endauth
                 </div>
             </div>
@@ -89,6 +92,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('marketplace')" :active="request()->routeIs('marketplace')">
                     {{ __('Marketplace') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.index')">
+                    {{ __('Wishlist') }}
                 </x-responsive-nav-link>
             </div>
 
