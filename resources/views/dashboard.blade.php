@@ -58,18 +58,14 @@
                                                class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
                                                 Edit
                                             </a>
-                                            @if(!$car->is_for_sale)
-                                                <form action="{{ route('sellCar', $car->id) }}" method="POST" class="inline-block" 
-                                                      onsubmit="return confirm('Are you sure you want to add this car to the marketplace?');">
-                                                    @csrf
-                                                    <button type="submit" 
-                                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                                        Sell Your Car
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <span class="text-gray-500 italic">Listed for Sale</span>
-                                            @endif
+                                            <form action="{{ route('toggleSale', $car->id) }}" method="POST" class="inline-block" 
+                                                  onsubmit="return confirm('Are you sure you want to {{ $car->is_for_sale ? 'remove this car from' : 'add this car to' }} the marketplace?');">
+                                                @csrf
+                                                <button type="submit" 
+                                                        class="bg-{{ $car->is_for_sale ? 'red' : 'green' }}-500 hover:bg-{{ $car->is_for_sale ? 'red' : 'green' }}-700 text-white font-bold py-2 px-4 rounded">
+                                                    {{ $car->is_for_sale ? 'Remove from Sale' : 'Sell Your Car' }}
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach

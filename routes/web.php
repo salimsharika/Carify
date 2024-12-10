@@ -4,50 +4,34 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CarController;
-use App\Http\Controllers\DashboardController;
-
-
-
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Car management routes
+    Route::get('/dashboard', [CarController::class, 'index'])->name('dashboard');
+    Route::get('/car/add', [CarController::class, 'create'])->name('addCar');
+    Route::post('/car/add', [CarController::class, 'store'])->name('storeCar');
+    Route::get('/car/{id}/edit', [CarController::class, 'edit'])->name('editCar');
+    Route::post('/car/{id}/update', [CarController::class, 'update'])->name('updateCar');
+    Route::get('/car/{id}/suggestions', [CarController::class, 'showSuggestions'])->name('showCarSuggestions');
+    
+    // Marketplace routes
+    Route::get('/marketplace', [CarController::class, 'marketplace'])->name('marketplace');
+    Route::post('/car/{id}/toggle-sale', [CarController::class, 'toggleSale'])->name('toggleSale');
 });
 
-
-
+// Admin routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('admin/dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
+});
 
 require __DIR__.'/auth.php';
-
-
-route::get('admin/dashboard',[HomeController::class,'index'])->middleware(['auth','admin']);
-
-
-
-// Dashboard route
-Route::get('/dashboard', [CarController::class, 'index'])->name('dashboard');
-
-// Add a car
-Route::get('/car/add', [CarController::class, 'create'])->name('addCar');
-Route::post('/car/add', [CarController::class, 'store']);
-
-// Edit a car
-Route::get('/car/{id}/edit', [CarController::class, 'edit'])->name('editCar');
-Route::post('/car/{id}/update', [CarController::class, 'update'])->name('updateCar');
-
-// Show car suggestions
-Route::get('/car/{id}/suggestions', [CarController::class, 'showSuggestions'])->name('showCarSuggestions');
-
-
-Route::get('/marketplace', [CarController::class, 'marketplace'])->name('marketplace');
-Route::post('/sell/{id}', [CarController::class, 'sellCar'])->name('sellCar');
-Route::post('/remove/{id}', [CarController::class, 'removeCarFromMarketplace'])->name('removeCarFromMarketplace');
-
+Route::post('/car/{id}/comment', [CarController::class, 'storeComment'])->name('storeComment');

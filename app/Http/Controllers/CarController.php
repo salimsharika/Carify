@@ -26,8 +26,8 @@ class CarController extends Controller
     {
         $request->validate([
             'car_name' => 'required|string|max:255',
-            'distance_travelled' => 'required|numeric',
-            'date_of_purchase' => 'required|date',
+            'distance_travelled' => 'required|numeric|min:0',
+            'date_of_purchase' => 'required|date|before_or_equal:today',
         ]);
 
         Car::create([
@@ -35,6 +35,7 @@ class CarController extends Controller
             'distance_travelled' => $request->distance_travelled,
             'date_of_purchase' => $request->date_of_purchase,
             'user_id' => Auth::id(),
+            'is_for_sale' => false,
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Car added successfully!');
@@ -54,8 +55,8 @@ class CarController extends Controller
 
         $request->validate([
             'car_name' => 'required|string|max:255',
-            'distance_travelled' => 'required|numeric',
-            'date_of_purchase' => 'required|date',
+            'distance_travelled' => 'required|numeric|min:0',
+            'date_of_purchase' => 'required|date|before_or_equal:today',
         ]);
 
         $car->update([
@@ -93,30 +94,46 @@ class CarController extends Controller
         return view('carSuggestions', compact('car', 'suggestions'));
     }
 
-    public function marketplace()
+        public function marketplace()
     {
-        $cars = Car::where('is_for_sale', true)->with('owner')->get();
+        $cars = Car::where('is_for_sale', true)
+            ->with(['owner', 'comments.user'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
         return view('marketplace', compact('cars'));
     }
-    
-    public function sellCar($id)
+
+    public function toggleSale($id)
     {
-        $car = Car::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-        
-        if ($car->is_for_sale) {
-            return redirect()->back()->withErrors('This car is already listed for sale.');
-        }
-        
-        $car->update(['is_for_sale' => true]);
-        return redirect()->route('dashboard')->with('success', 'Car listed for sale.');
+        $car = Car::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $car->update([
+            'is_for_sale' => !$car->is_for_sale
+        ]);
+
+        $message = $car->is_for_sale ? 
+            'Car has been listed in the marketplace!' : 
+            'Car has been removed from the marketplace!';
+
+        return redirect()->back()->with('success', $message);
     }
-    
-    public function removeCarFromMarketplace($id)
+
+        public function storeComment(Request $request, $carId)
     {
-        $car = Car::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-    
-        $car->update(['is_for_sale' => false]);
-        return redirect()->route('marketplace')->with('success', 'Car removed from marketplace.');
+        $request->validate([
+            'comment' => 'required|string|max:500',
+        ]);
+
+        $car = Car::findOrFail($carId);
+
+        $car->comments()->create([
+            'user_id' => Auth::id(),
+            'comment' => $request->comment,
+        ]);
+
+        return redirect()->route('marketplace')->with('success', 'Comment added successfully!');
     }
-    
 }
