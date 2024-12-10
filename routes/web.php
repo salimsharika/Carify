@@ -45,3 +45,9 @@ Route::post('/car/{id}/update', [CarController::class, 'update'])->name('updateC
 
 // Show car suggestions
 Route::get('/car/{id}/suggestions', [CarController::class, 'showSuggestions'])->name('showCarSuggestions');
+
+
+Route::get('/marketplace', [CarController::class, 'marketplace'])->name('marketplace');
+Route::post('/sell/{id}', [CarController::class, 'sellCar'])->name('sellCar');
+Route::post('/remove/{id}', [CarController::class, 'removeCarFromMarketplace'])->name('removeCarFromMarketplace');
+

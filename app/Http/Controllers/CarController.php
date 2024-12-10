@@ -92,4 +92,31 @@ class CarController extends Controller
 
         return view('carSuggestions', compact('car', 'suggestions'));
     }
+
+    public function marketplace()
+    {
+        $cars = Car::where('is_for_sale', true)->with('owner')->get();
+        return view('marketplace', compact('cars'));
+    }
+    
+    public function sellCar($id)
+    {
+        $car = Car::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        
+        if ($car->is_for_sale) {
+            return redirect()->back()->withErrors('This car is already listed for sale.');
+        }
+        
+        $car->update(['is_for_sale' => true]);
+        return redirect()->route('dashboard')->with('success', 'Car listed for sale.');
+    }
+    
+    public function removeCarFromMarketplace($id)
+    {
+        $car = Car::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+    
+        $car->update(['is_for_sale' => false]);
+        return redirect()->route('marketplace')->with('success', 'Car removed from marketplace.');
+    }
+    
 }
