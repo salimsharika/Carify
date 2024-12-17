@@ -51,17 +51,30 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function comments()
-    {
-        return $this->hasMany(Comment::class);
-    }
-
     /**
      * Get the cars in the user's wishlist.
      */
     public function wishlist()
     {
-        return $this->belongsToMany(Car::class, 'wishlists');
+        return $this->belongsToMany(Car::class, 'wishlists')
+                    ->withTimestamps()
+                    ->withPivot('created_at');
+    }
+
+    /**
+     * Get the cars owned by the user.
+     */
+    public function cars()
+    {
+        return $this->hasMany(Car::class);
+    }
+
+    /**
+     * Get the comments made by the user.
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function notifications()

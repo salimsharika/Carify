@@ -13,7 +13,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -26,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/car/{id}/edit', [CarController::class, 'edit'])->name('editCar');
     Route::post('/car/{id}/update', [CarController::class, 'update'])->name('updateCar');
     Route::get('/car/{id}/suggestions', [CarController::class, 'showSuggestions'])->name('showCarSuggestions');
+    Route::delete('/cars/{id}/remove', [CarController::class, 'removeCar'])->name('cars.remove');
     
     // Wishlist routes
     Route::get('/wishlist', [CarController::class, 'showWishlist'])->name('wishlist.index');
@@ -34,7 +35,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Marketplace routes
     Route::get('/marketplace', [CarController::class, 'marketplace'])->name('marketplace');
-    Route::post('/car/{id}/toggle-sale', [CarController::class, 'toggleSale'])->name('toggleSale');
+    Route::put('/cars/{id}/toggle-sale', [CarController::class, 'toggleSale'])->name('cars.toggleSale');
+    Route::post('/cars/{id}/remove-sale', [CarController::class, 'removeSalePost'])->name('removeSalePost');
 
     // Route for comparing cars
     Route::post('/cars/compare', [CarController::class, 'compare'])->name('cars.compare');
@@ -73,9 +75,8 @@ Route::post('/delete-comment/{id}', function ($id) {
     return redirect()->back()->with('error', 'Comment not found.');
 })->name('delete.comment')->middleware('auth');
 
-Route::post('/remove-sale-post/{car}', [CarController::class, 'removeSalePost'])->name('removeSalePost');
-
-require __DIR__.'/auth.php';
 Route::post('/car/{id}/comment', [CarController::class, 'storeComment'])->name('storeComment');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+require __DIR__.'/auth.php';

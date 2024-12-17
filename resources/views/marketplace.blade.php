@@ -54,10 +54,22 @@
                                                         <span class="text-gray-500 italic">Contact Owner</span>
                                                     @endif
                                                     <!-- Add to Wishlist -->
-                                                    <form action="{{ route('wishlist.add', $car->id) }}" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add to Wishlist</button>
-                                                    </form>
+                                                    @auth
+                                                        @if($car->user_id !== auth()->id())
+                                                            <form action="{{ route('wishlist.add', $car->id) }}" method="POST" class="mt-2">
+                                                                @csrf
+                                                                @if(in_array($car->id, $wishlistCarIds ?? []))
+                                                                    <button type="button" disabled class="bg-gray-400 text-white font-bold py-2 px-4 rounded cursor-not-allowed">
+                                                                        Already in Wishlist
+                                                                    </button>
+                                                                @else
+                                                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                                                        Add to Wishlist
+                                                                    </button>
+                                                                @endif
+                                                            </form>
+                                                        @endif
+                                                    @endauth
                                                 @endif
                                             </td>
                                         </tr>
