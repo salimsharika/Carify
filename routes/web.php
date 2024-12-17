@@ -4,6 +4,10 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CarController;
+use  Illuminate\Support\Facades\Facade;
+use App\Http\Controllers\NotificationController;
+use App\Models\Notification;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,12 +38,44 @@ Route::middleware(['auth'])->group(function () {
 
     // Route for comparing cars
     Route::post('/cars/compare', [CarController::class, 'compare'])->name('cars.compare');
+
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
 
 // Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('admin/dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
+    // Admin Dashboard
+    Route::get('admin/dashboard', [HomeController::class, 'adminDashboard'])->name('admin.dashboard');
+
+    // Edit user
+    Route::get('admin/user/{user}/edit', [HomeController::class, 'editUser'])->name('admin.edit');
+
+    // Update user
+    Route::patch('admin/user/{user}', [HomeController::class, 'updateUser'])->name('admin.update');
+
+    // Delete user
+    Route::delete('admin/user/{user}', [HomeController::class, 'deleteUser'])->name('admin.delete');
 });
+
+Route::post('/remove-sell/{car}', [CarController::class, 'removeSell'])->name('remove.sell.post');
+
+Route::post('/delete-comment/{id}', function ($id) {
+    $comment = \App\Models\Comment::find($id);
+
+    if ($comment) {
+        $comment->delete();
+        return redirect()->back()->with('success', 'Comment deleted successfully.');
+    }
+
+    return redirect()->back()->with('error', 'Comment not found.');
+})->name('delete.comment')->middleware('auth');
+
+Route::post('/remove-sale-post/{car}', [CarController::class, 'removeSalePost'])->name('removeSalePost');
 
 require __DIR__.'/auth.php';
 Route::post('/car/{id}/comment', [CarController::class, 'storeComment'])->name('storeComment');
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

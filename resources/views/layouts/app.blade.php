@@ -12,6 +12,7 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
+        @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
@@ -29,7 +30,11 @@
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                @if (isset($slot))
+                    {{ $slot }}
+                @else
+                    <p>No content to display</p>
+                @endif
             </main>
         </div>
     </body>

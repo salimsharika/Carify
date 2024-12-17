@@ -13,15 +13,35 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     @auth
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('marketplace')" :active="request()->routeIs('marketplace')">
-                            {{ __('Marketplace') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.index')">
-                            {{ __('Wishlist') }}
-                        </x-nav-link>
+                        @if(Auth::user()->usertype === 'admin')
+                            <!-- Admin Dashboard Link -->
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                {{ __('Admin Dashboard') }}
+                            </x-nav-link>
+                        @else
+                            <!-- Regular User Dashboard Link -->
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('marketplace')" :active="request()->routeIs('marketplace')">
+                                {{ __('Marketplace') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.index')">
+                                {{ __('Wishlist') }}
+                            </x-nav-link>
+                            <!-- Notifications Link -->
+                            <x-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.index')">
+                                {{ __('Notifications') }}
+                                @php
+                                    $unreadCount = Auth::user()->notifications()->where('is_read', false)->count();
+                                @endphp
+                                @if($unreadCount > 0)
+                                    <span class="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-2">
+                                        {{ $unreadCount }}
+                                    </span>
+                                @endif
+                            </x-nav-link>
+                        @endif
                     @endauth
                 </div>
             </div>
@@ -87,18 +107,31 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         @auth
             <div class="pt-2 pb-3 space-y-1">
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('marketplace')" :active="request()->routeIs('marketplace')">
-                    {{ __('Marketplace') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.index')">
-                    {{ __('Wishlist') }}
-                </x-responsive-nav-link>
+                @if(Auth::user()->usertype === 'admin')
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                        {{ __('Admin Dashboard') }}
+                    </x-responsive-nav-link>
+                @else
+                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('marketplace')" :active="request()->routeIs('marketplace')">
+                        {{ __('Marketplace') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('wishlist.index')" :active="request()->routeIs('wishlist.index')">
+                        {{ __('Wishlist') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.index')">
+                        {{ __('Notifications') }}
+                        @if($unreadCount > 0)
+                            <span class="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-2">
+                                {{ $unreadCount }}
+                            </span>
+                        @endif
+                    </x-responsive-nav-link>
+                @endif
             </div>
 
-            <!-- Responsive Settings Options -->
             <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
                 <div class="px-4">
                     <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
@@ -110,7 +143,6 @@
                         {{ __('Profile') }}
                     </x-responsive-nav-link>
 
-                    <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
 

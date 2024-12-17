@@ -198,4 +198,28 @@ class CarController extends Controller
 
         return view('compare', compact('cars'));
     }
+
+   public function removeSell($carId)
+   {
+       $car = Car::findOrFail($carId);
+       $car->is_for_sale = false;
+       $car->save();
+   
+       return redirect()->route('marketplace')->with('success', 'Car removed from sale.');
+   }
+   
+   public function removeSalePost(Car $car)
+   {
+       // Check if the authenticated user owns the car
+       if ($car->user_id !== auth()->id()) {
+           return redirect()->back()->with('error', 'You are not authorized to remove this car from sale.');
+       }
+   
+       // Update the `is_for_sale` property
+       $car->update(['is_for_sale' => false]);
+   
+       return redirect()->route('marketplace')->with('success', 'The car has been removed from sale.');
+   }
+   
+
 }
