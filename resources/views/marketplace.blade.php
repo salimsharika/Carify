@@ -36,14 +36,14 @@
                                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $car->owner->name }}</td>
                                             <td class="px-6 py-4 text-sm">
                                                 @if(auth()->user()->usertype === 'admin')
-                                                    <!-- Admin can remove the sell post -->
+                                                    <!-- Admin can delete the sell post -->
                                                     <form action="{{ route('remove.sell.post', $car->id) }}" method="POST" style="display:inline-block;">
                                                         @csrf
                                                         <button type="submit" class="text-red-500 hover:text-red-700">Remove Sell Post</button>
                                                     </form>
                                                 @else
                                                     @if($car->user_id === auth()->id())
-                                                        <!-- Owners can remove the sale post -->
+                                                        <!-- Owners can delete the sale post -->
                                                         <form action="{{ route('removeSalePost', $car->id) }}" method="POST" onsubmit="return confirm('Remove this car from the marketplace?');">
                                                             @csrf
                                                             <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
