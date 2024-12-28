@@ -18,19 +18,19 @@ class CarController extends Controller
         $carsForSale = $cars->where('is_for_sale', true)->count();
         $maintenanceDue = $cars->where('next_maintenance', '<=', now())->count();
         
-        // Simple workaround - just count raw database entries
+       
         $wishlistCount = DB::table('wishlists')->where('user_id', auth()->id())->count();
 
         return view('dashboard', compact('cars', 'totalCars', 'carsForSale', 'maintenanceDue', 'wishlistCount'));
     }
 
-    // Show the form to add a car
+  
     public function create()
     {
         return view('addCar');
     }
 
-    // Store the car information
+   
     public function store(Request $request)
     {
         $request->validate([
@@ -50,14 +50,14 @@ class CarController extends Controller
         return redirect()->route('dashboard')->with('success', 'Car added successfully!');
     }
 
-    // Show the form to edit a car
+    
     public function edit($id)
     {
         $car = Car::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         return view('editCar', compact('car'));
     }
 
-    // Update the car details
+    
     public function update(Request $request, $id)
     {
         $car = Car::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
@@ -77,22 +77,22 @@ class CarController extends Controller
         return redirect()->route('dashboard')->with('success', 'Car updated successfully!');
     }
 
-    // Show suggestions for a car
+    
     public function showSuggestions($id)
     {
         $car = Car::findOrFail($id);
         $distance = $car->distance_travelled;
         
-        // Get similar cars
+        
         $similarCars = Car::where('car_name', 'LIKE', '%' . $car->car_name . '%')
                          ->where('id', '!=', $car->id)
                          ->where('is_for_sale', true)
                          ->get();
 
-        // Get maintenance suggestions based on distance
+        
         $maintenanceSuggestions = [];
         
-        // Basic maintenance (every 5,000 km)
+      
         if ($distance % 5000 <= 1000) {
             $maintenanceSuggestions[] = [
                 'type' => 'Regular Check',
@@ -104,7 +104,7 @@ class CarController extends Controller
             ];
         }
 
-        // Oil change (every 8,000 km)
+        
         if ($distance % 8000 <= 1000) {
             $maintenanceSuggestions[] = [
                 'type' => 'Oil Service',
@@ -128,7 +128,7 @@ class CarController extends Controller
             ];
         }
 
-        // Major service suggestions based on total distance
+        
         if ($distance >= 20000 && $distance < 25000) {
             $maintenanceSuggestions[] = [
                 'type' => 'Major Service',
@@ -161,7 +161,7 @@ class CarController extends Controller
             ];
         }
 
-        // Brake fluid (every 30,000 km)
+        
         if ($distance % 30000 <= 1000) {
             $maintenanceSuggestions[] = [
                 'type' => 'Brake Service',
